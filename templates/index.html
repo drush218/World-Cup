@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Table – WC2026 Sweepstake</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #f0e6d4;
+      font-family: 'Archivo', sans-serif;
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 480px;
+      margin: 0 auto;
+      background: #fbf2e3;
+      min-height: 100vh;
+      box-shadow: 0 0 60px rgba(120,80,30,.10);
+      padding-bottom: 48px;
+    }
+
+    /* ── Header ── */
+    .hdr {
+      position: relative;
+      padding: 26px 22px;
+      background: #e2342e;
+      overflow: hidden;
+    }
+    .hdr-stripe {
+      position: absolute; top: 0;
+      width: 130px; height: 100%;
+      transform: skewX(-18deg);
+    }
+    .hdr-stripe--green { right: -40px;  background: #1f9d55; }
+    .hdr-stripe--blue  { right: -140px; background: #2b6fe0; }
+
+    .hdr-inner { position: relative; z-index: 1; }
+
+    .hdr-eyebrow {
+      font-weight: 800; font-size: 11px;
+      letter-spacing: .18em; text-transform: uppercase;
+      color: rgba(255,255,255,.88);
+    }
+    .hdr-title {
+      font-family: 'Anton', sans-serif;
+      font-size: 52px; line-height: .88;
+      color: #fff; text-transform: uppercase;
+      margin-top: 6px; letter-spacing: .01em;
+    }
+    .hdr-pills {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      align-items: center; margin-top: 16px;
+    }
+    .pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      border-radius: 30px; padding: 6px 14px;
+      color: #fff; white-space: nowrap;
+    }
+    .pill--dark  { background: rgba(0,0,0,.22);       font-weight: 700; font-size: 12.5px; }
+    .pill--light { background: rgba(255,255,255,.18); font-weight: 600; font-size: 12px; }
+
+    /* ── Summary card ── */
+    .sum-card {
+      margin: 18px 14px 6px;
+      background: #fff; border-radius: 18px;
+      box-shadow: 0 4px 14px rgba(120,80,30,.10);
+      overflow: hidden;
+    }
+    .sum-bar {
+      background: #241a10; color: #fff;
+      padding: 12px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .sum-bar-title {
+      font-family: 'Anton', sans-serif;
+      font-size: 15px; letter-spacing: .03em; text-transform: uppercase;
+    }
+    .sum-bar-impact {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase; color: #bcae97;
+    }
+    .match {
+      padding: 8px 16px;
+      border-bottom: 1px solid #f3ece0;
+    }
+    .match:last-child { border-bottom: none; }
+
+    .match-top {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .match-side {
+      flex: 1; display: flex; align-items: center; min-width: 0;
+    }
+    .match-side--home { justify-content: flex-end; }
+    .match-side--away { justify-content: flex-start; }
+    .match-tname {
+      font-weight: 700; font-size: 14px; color: #241a10;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .match-score {
+      font-family: 'Anton', sans-serif;
+      font-size: 20px; color: #241a10;
+      white-space: nowrap; letter-spacing: .02em; flex: none;
+    }
+
+    .match-badge-row { text-align: center; margin-top: 3px; }
+    .badge {
+      display: inline-block;
+      font-size: 9.5px; font-weight: 800;
+      letter-spacing: .08em; text-transform: uppercase;
+      padding: 2px 9px; border-radius: 20px;
+    }
+    .badge--home { background: #e4f5ec; color: #1f7a48; }
+    .badge--away { background: #fdeae8; color: #c0392b; }
+    .badge--draw { background: #f0eadb; color: #7a7158; }
+
+    .match-impact { display: flex; gap: 8px; margin-top: 6px; }
+    .impact-box {
+      flex: 1; background: #faf6ee;
+      border-radius: 10px; padding: 6px 8px;
+    }
+    .impact-header {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 10px; font-weight: 800;
+      letter-spacing: .04em; text-transform: uppercase;
+    }
+    .impact--win  { color: #1f9d55; }
+    .impact--loss { color: #d8362f; }
+    .impact--draw { color: #9a9486; }
+    .impact-pickers {
+      font-size: 11.5px; color: #6b6356;
+      font-weight: 600; margin-top: 2px; line-height: 1.35;
+    }
+
+    /* ── Standings ── */
+    .stnd-hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px 8px;
+    }
+    .stnd-title {
+      font-family: 'Anton', sans-serif;
+      font-size: 15px; text-transform: uppercase;
+      letter-spacing: .04em; color: #241a10;
+    }
+    .stnd-hint { font-size: 11px; font-weight: 600; color: #a99c84; }
+
+    .cards {
+      padding: 0 14px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+
+    /* ── Player card ── */
+    .card {
+      position: relative;
+      background: #fff; border-radius: 16px;
+      box-shadow: 0 3px 10px rgba(120,80,30,.08);
+      overflow: hidden;
+    }
+    .card--first { border: 2px solid #F4C430; }
+
+    .card-row {
+      position: relative;
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 14px 11px 12px;
+      cursor: pointer;
+    }
+    .card--first .card-row::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(110deg, rgba(244,196,48,.16), rgba(244,196,48,0) 55%);
+      pointer-events: none;
+    }
+
+    .rank {
+      position: relative;
+      width: 36px; height: 36px; flex: none;
+      border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Anton', sans-serif; font-size: 19px;
+    }
+    .rank--1 { background: #F4C430; color: #1a1505; }
+    .rank--2 { background: #C9D0DA; color: #1c2330; }
+    .rank--3 { background: #D08A4F; color: #241204; }
+    .rank--n { background: rgba(140,144,156,.16); color: #241a10; }
+
+    .pinfo { position: relative; flex: 1; min-width: 0; }
+    .pname-row { display: flex; align-items: center; gap: 6px; }
+    .pname {
+      font-weight: 800; font-size: 15.5px; color: #241a10;
+      letter-spacing: -.01em;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    .chips { display: flex; gap: 3px; margin-top: 4px; flex-wrap: wrap; }
+    .chip {
+      font-weight: 700; font-size: 9.5px;
+      letter-spacing: .03em;
+      border-radius: 4px; padding: 1px 4px;
+    }
+    .chip--fav { background: #fdeade; color: #c0432f; }
+    .chip--und { background: #e7f3ec; color: #1f7a48; }
+
+    .pts-wrap {
+      position: relative;
+      display: flex; align-items: center; gap: 8px; flex: none;
+    }
+    .pts-col { display: flex; flex-direction: column; align-items: flex-end; }
+    .pts {
+      font-family: 'Anton', sans-serif;
+      font-size: 24px; line-height: 1; color: #e2342e;
+    }
+    .pts-lbl {
+      font-size: 9px; font-weight: 800;
+      letter-spacing: .1em; color: #bcae97; text-transform: uppercase;
+    }
+    .chev {
+      font-size: 14px; color: #c9bda5;
+      display: inline-block; transition: transform .15s;
+      line-height: 1;
+    }
+    .card.open > .card-row .chev { transform: rotate(90deg); }
+
+    /* ── Breakdown panel ── */
+    .panel {
+      display: none;
+      background: #faf6ee;
+      border-top: 1px solid #f0e6d4;
+      padding: 12px 12px 14px;
+    }
+    .card.open > .panel { display: block; }
+
+    /* ── Team row ── */
+    .trow {
+      background: #fff; border-radius: 11px;
+      margin-bottom: 7px;
+      box-shadow: 0 1px 4px rgba(120,80,30,.06);
+      overflow: hidden;
+    }
+    .trow-hdr {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 11px; cursor: pointer;
+    }
+    .tier {
+      flex: none;
+      font-size: 9px; font-weight: 800;
+      letter-spacing: .03em; color: #fff;
+      border-radius: 5px; padding: 3px 6px;
+    }
+    .tier-1 { background: #e2342e; }
+    .tier-2 { background: #e8772e; }
+    .tier-3 { background: #d9a521; }
+    .tier-4 { background: #1f9d55; }
+    .tier-5 { background: #2b6fe0; }
+    .tier-6 { background: #7a4fd0; }
+
+    .tinfo { flex: 1; min-width: 0; }
+    .tname-row { display: flex; align-items: center; gap: 5px; }
+    .tname {
+      font-weight: 700; font-size: 13.5px; color: #241a10;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .tstat {
+      font-size: 10.5px; color: #9a8f7c;
+      font-weight: 600; margin-top: 1px;
+    }
+    .tpts {
+      font-family: 'Anton', sans-serif;
+      font-size: 16px; white-space: nowrap; flex: none;
+    }
+    .tpts--pos  { color: #1f9d55; }
+    .tpts--neg  { color: #d8362f; }
+    .tpts--zero { color: #9a9486; }
+
+    .tchev {
+      font-size: 12px; color: #cbbfa7;
+      display: inline-block; transition: transform .15s;
+      line-height: 1; flex: none;
+    }
+    .trow.open > .trow-hdr .tchev { transform: rotate(90deg); }
+
+    /* ── Fixture panel ── */
+    .fx {
+      display: none;
+      background: #faf6ee;
+      border-top: 1px dashed #e7dcc8;
+      padding: 7px 11px 9px;
+    }
+    .trow.open > .fx { display: block; }
+
+    .fix-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 4px 0; border-bottom: 1px solid #f0e6d4;
+    }
+    .fix-row:last-child { border-bottom: none; }
+    .fix-opp {
+      flex: 1; font-size: 12px; color: #5e564a;
+      font-weight: 600;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .fix-manual {
+      font-size: 8.5px; font-weight: 800;
+      letter-spacing: .04em; color: #8a6a3a;
+      background: #f3e6cd; border-radius: 3px;
+      padding: 1px 4px; margin-left: 5px;
+    }
+    .fix-score {
+      font-size: 12px; font-weight: 700; color: #241a10; white-space: nowrap;
+    }
+    .fix-res {
+      font-size: 10px; font-weight: 800;
+      width: 16px; text-align: center;
+      border-radius: 4px; padding: 1px 0; color: #fff; flex: none;
+    }
+    .fix-res--W { background: #1f9d55; }
+    .fix-res--D { background: #b3a98f; }
+    .fix-res--L { background: #d8362f; }
+    .fix-empty {
+      font-size: 11.5px; color: #a99c84;
+      font-style: italic; padding: 3px 0;
+    }
+
+    /* ── Award picks card ── */
+    .aw-card {
+      margin-top: 9px;
+      background: #fff; border-radius: 11px;
+      padding: 10px 12px;
+      box-shadow: 0 1px 4px rgba(120,80,30,.06);
+    }
+    .aw-title {
+      font-size: 10px; font-weight: 800;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: #bcae97; margin-bottom: 7px;
+    }
+    .aw-list { display: flex; flex-direction: column; gap: 6px; }
+    .aw-row { display: flex; align-items: center; gap: 8px; }
+    .aw-lbl {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: .04em; text-transform: uppercase;
+      color: #9a8f7c; width: 88px; flex: none;
+    }
+    .aw-pick { flex: 1; font-size: 13px; font-weight: 700; color: #241a10; }
+    .aw-ok {
+      font-size: 10px; font-weight: 800; color: #1f9d55;
+      background: #e4f5ec; border-radius: 5px; padding: 2px 7px;
+    }
+    .aw-tbd { font-size: 10px; font-weight: 700; color: #bcae97; }
+    .aw-bonus {
+      margin-top: 8px; padding-top: 8px;
+      border-top: 1px solid #f0e6d4;
+      font-size: 12px; font-weight: 700; color: #1f9d55;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center; padding: 24px 0 0;
+    }
+    .admin-link {
+      font-size: 11px; font-weight: 600;
+      color: #a99c84; text-decoration: none;
+      letter-spacing: .05em;
+    }
+    .admin-link:hover { color: #6b6356; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Header ── -->
+  <div class="hdr">
+    <div class="hdr-stripe hdr-stripe--green"></div>
+    <div class="hdr-stripe hdr-stripe--blue"></div>
+    <div class="hdr-inner">
+      <div class="hdr-eyebrow">FIFA World Cup 2026 · The Sweepstake</div>
+      <div class="hdr-title">The<br>Table</div>
+      <div class="hdr-pills">
+        {% if matchday_info.number %}
+        <span class="pill pill--dark">⚽ Match Day {{ matchday_info.number }}</span>
+        {% endif %}
+        <span class="pill pill--light">{{ num_players }} players · updated {{ last_updated }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Summary of Latest Results ── -->
+  {% if matchday_info.matches %}
+  <div class="sum-card">
+    <div class="sum-bar">
+      <span class="sum-bar-title">Summary of Latest Results</span>
+      <span class="sum-bar-impact">Impact</span>
+    </div>
+    {% for m in matchday_info.matches %}
+    {% set hr = 'win'  if m.result == 'H' else ('draw' if m.result == 'D' else 'loss') %}
+    {% set ar = 'win'  if m.result == 'A' else ('draw' if m.result == 'D' else 'loss') %}
+    {% set ha = '▲'   if hr == 'win'     else ('▬'    if hr == 'draw'    else '▼')    %}
+    {% set aa = '▲'   if ar == 'win'     else ('▬'    if ar == 'draw'    else '▼')    %}
+    <div class="match">
+      <div class="match-top">
+        <div class="match-side match-side--home">
+          <span class="match-tname">{{ m.home }}</span>
+        </div>
+        <span class="match-score">{{ m.home_score }}–{{ m.away_score }}</span>
+        <div class="match-side match-side--away">
+          <span class="match-tname">{{ m.away }}</span>
+        </div>
+      </div>
+      <div class="match-badge-row">
+        <span class="badge badge--{{ 'home' if m.result == 'H' else ('away' if m.result == 'A' else 'draw') }}">
+          {{ 'Home Win' if m.result == 'H' else ('Away Win' if m.result == 'A' else 'Draw') }}
+        </span>
+      </div>
+      <div class="match-impact">
+        <div class="impact-box">
+          <div class="impact-header impact--{{ hr }}">{{ ha }} {{ team_code.get(m.home, m.home[:3].upper()) }}</div>
+          <div class="impact-pickers">{{ m.home_pickers | join(', ') if m.home_pickers else 'no entries' }}</div>
+        </div>
+        <div class="impact-box">
+          <div class="impact-header impact--{{ ar }}">{{ aa }} {{ team_code.get(m.away, m.away[:3].upper()) }}</div>
+          <div class="impact-pickers">{{ m.away_pickers | join(', ') if m.away_pickers else 'no entries' }}</div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ── Standings ── -->
+  <div class="stnd-hdr">
+    <span class="stnd-title">Standings</span>
+    <span class="stnd-hint">tap a player ▾</span>
+  </div>
+
+  <div class="cards">
+    {% for s in scores %}
+    {% set pidx = loop.index %}
+    <div class="card{% if s.rank == 1 %} card--first{% endif %}" id="card-{{ pidx }}">
+
+      <!-- Summary row -->
+      <div class="card-row" data-player-toggle="{{ pidx }}">
+        <div class="rank rank--{{ s.rank if s.rank <= 3 else 'n' }}">{{ s.rank }}</div>
+        <div class="pinfo">
+          <div class="pname-row">
+            <span class="pname">{{ s.name }}</span>
+            {% if s.rank == 1 %}<span style="font-size:15px;flex:none">🏆</span>{% endif %}
+            {% if loop.last %}<span style="font-size:14px;flex:none">🪵</span>{% endif %}
+          </div>
+          <div class="chips">
+            {% for b in s.breakdown %}
+            <span class="chip chip--{{ 'fav' if b.group <= 3 else 'und' }}">{{ team_code.get(b.team, b.team[:3].upper()) }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="pts-wrap">
+          <div class="pts-col">
+            <span class="pts">{{ s.total }}</span>
+            <span class="pts-lbl">pts</span>
+          </div>
+          <span class="chev">›</span>
+        </div>
+      </div>
+
+      <!-- Breakdown panel -->
+      <div class="panel">
+        {% for b in s.breakdown %}
+        {% set tkey = pidx|string + '-' + loop.index0|string %}
+        {% set fixtures = team_fixtures.get(b.team, []) %}
+        <div class="trow" id="trow-{{ tkey }}">
+          <div class="trow-hdr" data-team-toggle="{{ tkey }}">
+            <span class="tier tier-{{ b.group }}">T{{ b.group }}</span>
+            <div class="tinfo">
+              <div class="tname-row">
+                <span class="tname">{{ b.team }}</span>
+                {% if b.won_wc %}<span style="font-size:12px">🏆</span>{% endif %}
+              </div>
+              <div class="tstat">
+                {{ b.games_played }} GP · {{ b.wins }}W {{ b.draws }}D {{ b.losses }}L{%
+                  if b.ko_rounds > 0 %} · KO{{ b.ko_rounds }}{% endif %}{%
+                  if b.heavy_losses > 0 %} · {{ b.heavy_losses }} heavy{% endif %}
+              </div>
+            </div>
+            <span class="tpts tpts--{{ 'pos' if b.points > 0 else ('neg' if b.points < 0 else 'zero') }}">{{ '+' if b.points > 0 else '' }}{{ b.points }}</span>
+            <span class="tchev">›</span>
+          </div>
+          <div class="fx">
+            {% if fixtures %}
+              {% for f in fixtures %}
+              <div class="fix-row">
+                <span class="fix-opp">vs {{ f.opponent }}{% if f.source == 'manual' %}<span class="fix-manual">MANUAL</span>{% endif %}</span>
+                <span class="fix-score">{{ f.team_score }}–{{ f.opp_score }}</span>
+                <span class="fix-res fix-res--{{ f.result }}">{{ f.result }}</span>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="fix-empty">No results recorded yet.</div>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+
+        <!-- Award Picks -->
+        <div class="aw-card">
+          <div class="aw-title">Award Picks</div>
+          <div class="aw-list">
+            <div class="aw-row">
+              <span class="aw-lbl">Golden Boot</span>
+              <span class="aw-pick">{{ s.ts }}</span>
+              {% if awards.golden_boot and awards.golden_boot == s.ts %}<span class="aw-ok">✓ +5</span>{% else %}<span class="aw-tbd">TBD</span>{% endif %}
+            </div>
+            <div class="aw-row">
+              <span class="aw-lbl">Golden Glove</span>
+              <span class="aw-pick">{{ s.gg }}</span>
+              {% if awards.golden_glove and awards.golden_glove == s.gg %}<span class="aw-ok">✓ +5</span>{% else %}<span class="aw-tbd">TBD</span>{% endif %}
+            </div>
+            <div class="aw-row">
+              <span class="aw-lbl">Player of T.</span>
+              <span class="aw-pick">{{ s.pott }}</span>
+              {% if awards.pott and awards.pott == s.pott %}<span class="aw-ok">✓ +5</span>{% else %}<span class="aw-tbd">TBD</span>{% endif %}
+            </div>
+          </div>
+          {% if s.award_pts > 0 %}
+          <div class="aw-bonus">Award bonus: +{{ s.award_pts }} pts</div>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="footer">
+    <a href="/admin" class="admin-link">Admin ✎</a>
+  </div>
+
+</div>
+
+<script>
+  document.addEventListener('click', function(e) {
+    var pt = e.target.closest('[data-player-toggle]');
+    if (pt) {
+      document.getElementById('card-' + pt.dataset.playerToggle).classList.toggle('open');
+      return;
+    }
+    var tt = e.target.closest('[data-team-toggle]');
+    if (tt) {
+      document.getElementById('trow-' + tt.dataset.teamToggle).classList.toggle('open');
+    }
+  });
+</script>
+</body>
+</html>
