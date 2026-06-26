@@ -197,7 +197,10 @@
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
 
-    .chips { display: flex; gap: 3px; margin-top: 4px; flex-wrap: wrap; }
+    .chips { display: flex; gap: 3px; margin-top: 4px; flex-wrap: wrap; align-items: center; }
+    .gp-col { display: flex; flex-direction: column; align-items: flex-end; }
+    .gp-num { font-family: 'Anton', sans-serif; font-size: 16px; line-height: 1; color: #c9bda5; }
+    .gp-lbl { font-size: 9px; font-weight: 800; letter-spacing: .1em; color: #bcae97; text-transform: uppercase; }
     .chip {
       font-weight: 700; font-size: 9.5px;
       letter-spacing: .03em;
@@ -208,7 +211,7 @@
 
     .pts-wrap {
       position: relative;
-      display: flex; align-items: center; gap: 8px; flex: none;
+      display: flex; align-items: flex-end; gap: 8px; flex: none;
     }
     .pts-col { display: flex; flex-direction: column; align-items: flex-end; }
     .pts {
@@ -222,7 +225,7 @@
     .chev {
       font-size: 14px; color: #c9bda5;
       display: inline-block; transition: transform .15s;
-      line-height: 1;
+      line-height: 1; align-self: center;
     }
     .card.open > .card-row .chev { transform: rotate(90deg); }
 
@@ -456,6 +459,10 @@
           </div>
         </div>
         <div class="pts-wrap">
+          <div class="gp-col">
+            <span class="gp-num">{{ s.games_played }}</span>
+            <span class="gp-lbl">GP</span>
+          </div>
           <div class="pts-col">
             <span class="pts">{{ s.total }}</span>
             <span class="pts-lbl">pts</span>
