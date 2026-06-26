@@ -191,10 +191,11 @@
       display: flex; align-items: center; justify-content: center;
       font-family: 'Anton', sans-serif; font-size: 19px;
     }
-    .rank--1 { background: #F4C430; color: #1a1505; }
-    .rank--2 { background: #C9D0DA; color: #1c2330; }
-    .rank--3 { background: #D08A4F; color: #241204; }
-    .rank--n { background: rgba(140,144,156,.16); color: #241a10; }
+    .rank--1    { background: #F4C430; color: #1a1505; }
+    .rank--2    { background: #C9D0DA; color: #1c2330; }
+    .rank--3    { background: #D08A4F; color: #241204; }
+    .rank--n    { background: rgba(140,144,156,.16); color: #241a10; }
+    .rank--goat { background: #1f9d55; color: #fff; font-size: 16px; }
 
     .pinfo { position: relative; flex: 1; min-width: 0; }
     .pname-row { display: flex; align-items: center; gap: 6px; }
@@ -452,14 +453,18 @@
 
       <!-- Summary row -->
       <div class="card-row" data-player-toggle="{{ pidx }}">
+        {% if s.is_goat %}
+        <div class="rank rank--goat">★</div>
+        {% else %}
         <div class="rank rank--{{ s.rank if s.rank <= 3 else 'n' }}">{{ s.rank }}</div>
+        {% endif %}
         <div class="pinfo">
           <div class="pname-row">
             <span class="pname">{{ s.name }}</span>
             {% if s.is_goat %}<span style="font-size:15px;flex:none">🐐</span>
             {% else %}
               {% if s.rank == 1 %}<span style="font-size:15px;flex:none">🏆</span>{% endif %}
-              {% if loop.last %}<span style="font-size:14px;flex:none">🪵</span>{% endif %}
+              {% if s.is_last %}<span style="font-size:14px;flex:none">🪵</span>{% endif %}
             {% endif %}
           </div>
           <div class="chips">

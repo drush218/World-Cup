@@ -27,27 +27,54 @@ PLAYERS = [
 ]
 
 TEAM_GROUP = {
-    "Portugal": 1, "France": 1, "Spain": 1, "England": 1,
-    "Germany": 2, "Belgium": 2, "Mexico": 2,
-    "Switzerland": 3, "Japan": 3, "Ecuador": 3, "Turkey": 3,
-    "Sweden": 4, "Canada": 4, "Norway": 4, "Egypt": 4, "Algeria": 4,
-    "Scotland": 5, "Czech Republic": 5,
-    "Bosnia": 6, "Saudi Arabia": 6, "Ghana": 6,
+    # Group 1 — favourites tier
+    "France": 1, "Spain": 1, "Brazil": 1, "England": 1,
+    "Portugal": 1, "Netherlands": 1, "Argentina": 1, "Morocco": 1,
+    # Group 2 — favourites tier
+    "Uruguay": 2, "Belgium": 2, "Senegal": 2, "Croatia": 2,
+    "Germany": 2, "Colombia": 2, "Mexico": 2, "USA": 2,
+    # Group 3 — mid tier
+    "Switzerland": 3, "Turkey": 3, "Iran": 3, "Japan": 3,
+    "South Korea": 3, "Ecuador": 3, "Austria": 3, "Australia": 3,
+    # Group 4 — mid tier
+    "Algeria": 4, "Sweden": 4, "Panama": 4, "Egypt": 4,
+    "Canada": 4, "Ivory Coast": 4, "Paraguay": 4, "Norway": 4,
+    # Group 5 — underdog tier
+    "Czech Republic": 5, "Uzbekistan": 5, "Qatar": 5, "Iraq": 5,
+    "Congo DR": 5, "Scotland": 5, "South Africa": 5, "Tunisia": 5,
+    # Group 6 — underdog tier
+    "New Zealand": 6, "Haiti": 6, "Saudi Arabia": 6, "Bosnia": 6,
+    "Jordan": 6, "Cape Verde": 6, "Curacao": 6, "Ghana": 6,
 }
 
 TEAM_CODE = {
-    "Portugal": "POR", "France": "FRA", "Spain": "ESP", "England": "ENG",
-    "Germany": "GER", "Belgium": "BEL", "Mexico": "MEX",
-    "Switzerland": "SUI", "Japan": "JPN", "Ecuador": "ECU", "Turkey": "TUR",
-    "Sweden": "SWE", "Canada": "CAN", "Norway": "NOR", "Egypt": "EGY", "Algeria": "ALG",
-    "Scotland": "SCO", "Czech Republic": "CZE",
-    "Bosnia": "BIH", "Saudi Arabia": "KSA", "Ghana": "GHA",
+    "France": "FRA", "Spain": "ESP", "Brazil": "BRA", "England": "ENG",
+    "Portugal": "POR", "Netherlands": "NED", "Argentina": "ARG", "Morocco": "MAR",
+    "Uruguay": "URU", "Belgium": "BEL", "Senegal": "SEN", "Croatia": "CRO",
+    "Germany": "GER", "Colombia": "COL", "Mexico": "MEX", "USA": "USA",
+    "Switzerland": "SUI", "Turkey": "TUR", "Iran": "IRN", "Japan": "JPN",
+    "South Korea": "KOR", "Ecuador": "ECU", "Austria": "AUT", "Australia": "AUS",
+    "Algeria": "ALG", "Sweden": "SWE", "Panama": "PAN", "Egypt": "EGY",
+    "Canada": "CAN", "Ivory Coast": "CIV", "Paraguay": "PAR", "Norway": "NOR",
+    "Czech Republic": "CZE", "Uzbekistan": "UZB", "Qatar": "QAT", "Iraq": "IRQ",
+    "Congo DR": "COD", "Scotland": "SCO", "South Africa": "RSA", "Tunisia": "TUN",
+    "New Zealand": "NZL", "Haiti": "HAI", "Saudi Arabia": "KSA", "Bosnia": "BIH",
+    "Jordan": "JOR", "Cape Verde": "CPV", "Curacao": "CUR", "Ghana": "GHA",
 }
 
 TEAM_NAME_MAP = {
     "Bosnia and Herzegovina": "Bosnia",
     "Bosnia-Herzegovina": "Bosnia",
     "Czechia": "Czech Republic",
+    "Korea Republic": "South Korea",
+    "Republic of Korea": "South Korea",
+    "DR Congo": "Congo DR",
+    "Democratic Republic of Congo": "Congo DR",
+    "Côte d'Ivoire": "Ivory Coast",
+    "Cote d'Ivoire": "Ivory Coast",
+    "United States": "USA",
+    "Cabo Verde": "Cape Verde",
+    "Iran (Islamic Republic of)": "Iran",
 }
 
 _cache: dict = {"stats": None, "fixtures": None, "matchday": None, "ts": 0.0}
@@ -101,7 +128,7 @@ def fetch_raw_from_api() -> tuple[dict, dict, dict]:
     except Exception:
         return {}, {}, {}
 
-    all_teams = {pick for p in PLAYERS for pick in p["picks"]}
+    all_teams = set(TEAM_GROUP.keys())
     raw: dict[str, dict]  = {t: _empty_raw() for t in all_teams}
     team_matches: dict[str, list] = {t: [] for t in all_teams}
 
@@ -195,7 +222,7 @@ def save_fixtures(fixtures: list[dict]) -> None:
 
 
 def compute_raw_from_fixtures(fixtures: list[dict]) -> tuple[dict, dict]:
-    all_teams = {pick for p in PLAYERS for pick in p["picks"]}
+    all_teams = set(TEAM_GROUP.keys())
     raw: dict[str, dict]  = {t: _empty_raw() for t in all_teams}
     team_matches: dict[str, list] = {t: [] for t in all_teams}
 
@@ -392,10 +419,13 @@ def compute_scores() -> tuple[list, dict, dict]:
         stats = {**stats, wc_winner: {**stats[wc_winner], "won_wc": True}}
 
     scores = [score_player(p, stats, awards) for p in PLAYERS]
-    scores.append(score_goat(stats))
+    goat = score_goat(stats)
     scores.sort(key=lambda x: x["total"], reverse=True)
     for i, s in enumerate(scores):
         s["rank"] = i + 1
+        s["is_last"] = False
+    scores[-1]["is_last"] = True
+    scores.append(goat)
 
     return scores, team_fixtures, matchday_info
 
