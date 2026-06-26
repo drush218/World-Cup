@@ -301,29 +301,36 @@ def save_awards(awards: dict) -> None:
 # Scoring
 # ---------------------------------------------------------------------------
 
+def _empty_team_stats() -> dict:
+    return {
+        "wins": 0, "losses": 0, "draws": 0, "heavy_losses": 0,
+        "games_played": 0, "ko_rounds": 0, "out_of_group": False, "won_wc": False,
+    }
+
+
+def _team_pts(group: int, s: dict) -> int:
+    pts = 0
+    if group <= 3:
+        pts += s["wins"] * 3 + s["losses"] * -6
+    else:
+        pts += s["wins"] * 6 + s["losses"] * -3
+    pts += s["heavy_losses"] * -5
+    if s["out_of_group"]:
+        pts += 5
+    pts += s["ko_rounds"] * 5
+    if s["won_wc"]:
+        pts += 8
+    return pts
+
+
 def score_player(player: dict, results: dict, awards: dict) -> dict:
     total = 0
     breakdown = []
 
     for pick in player["picks"]:
         group = TEAM_GROUP.get(pick, 0)
-        s = results.get(pick, {
-            "wins": 0, "losses": 0, "draws": 0, "heavy_losses": 0,
-            "games_played": 0, "ko_rounds": 0, "out_of_group": False, "won_wc": False,
-        })
-
-        pts = 0
-        if group <= 3:
-            pts += s["wins"] * 3 + s["losses"] * -6
-        else:
-            pts += s["wins"] * 6 + s["losses"] * -3
-        pts += s["heavy_losses"] * -5
-        if s["out_of_group"]:
-            pts += 5
-        pts += s["ko_rounds"] * 5
-        if s["won_wc"]:
-            pts += 8
-
+        s = results.get(pick, _empty_team_stats())
+        pts = _team_pts(group, s)
         total += pts
         breakdown.append({**s, "team": pick, "group": group, "points": pts})
 
@@ -340,6 +347,39 @@ def score_player(player: dict, results: dict, awards: dict) -> dict:
         "award_pts": award_pts,
         "total": total,
         "games_played": sum(b["games_played"] for b in breakdown),
+        "is_goat": False,
+    }
+
+
+def score_goat(stats: dict) -> dict:
+    """Retroactively picks the highest-scoring team from each group."""
+    group_teams: dict[int, list[str]] = {}
+    for team, group in TEAM_GROUP.items():
+        group_teams.setdefault(group, []).append(team)
+
+    breakdown = []
+    total = 0
+
+    for group in sorted(group_teams):
+        best_team, best_pts = None, None
+        for team in group_teams[group]:
+            s = stats.get(team, _empty_team_stats())
+            pts = _team_pts(group, s)
+            if best_pts is None or pts > best_pts:
+                best_pts, best_team = pts, team
+
+        s = stats.get(best_team, _empty_team_stats())
+        breakdown.append({**s, "team": best_team, "group": group, "points": best_pts})
+        total += best_pts
+
+    return {
+        "name": "The GOAT",
+        "ts": "", "gg": "", "pott": "",
+        "breakdown": breakdown,
+        "award_pts": 0,
+        "total": total,
+        "games_played": sum(b["games_played"] for b in breakdown),
+        "is_goat": True,
     }
 
 
@@ -352,6 +392,7 @@ def compute_scores() -> tuple[list, dict, dict]:
         stats = {**stats, wc_winner: {**stats[wc_winner], "won_wc": True}}
 
     scores = [score_player(p, stats, awards) for p in PLAYERS]
+    scores.append(score_goat(stats))
     scores.sort(key=lambda x: x["total"], reverse=True)
     for i, s in enumerate(scores):
         s["rank"] = i + 1

@@ -163,6 +163,13 @@
       overflow: hidden;
     }
     .card--first { border: 2px solid #F4C430; }
+    .card--goat  { border: 2px solid #1f9d55; }
+    .card--goat .card-row::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(110deg, rgba(31,157,85,.10), rgba(31,157,85,0) 55%);
+      pointer-events: none;
+    }
 
     .card-row {
       position: relative;
@@ -441,7 +448,7 @@
   <div class="cards">
     {% for s in scores %}
     {% set pidx = loop.index %}
-    <div class="card{% if s.rank == 1 %} card--first{% endif %}" id="card-{{ pidx }}">
+    <div class="card{% if s.rank == 1 and not s.is_goat %} card--first{% endif %}{% if s.is_goat %} card--goat{% endif %}" id="card-{{ pidx }}">
 
       <!-- Summary row -->
       <div class="card-row" data-player-toggle="{{ pidx }}">
@@ -449,8 +456,11 @@
         <div class="pinfo">
           <div class="pname-row">
             <span class="pname">{{ s.name }}</span>
-            {% if s.rank == 1 %}<span style="font-size:15px;flex:none">🏆</span>{% endif %}
-            {% if loop.last %}<span style="font-size:14px;flex:none">🪵</span>{% endif %}
+            {% if s.is_goat %}<span style="font-size:15px;flex:none">🐐</span>
+            {% else %}
+              {% if s.rank == 1 %}<span style="font-size:15px;flex:none">🏆</span>{% endif %}
+              {% if loop.last %}<span style="font-size:14px;flex:none">🪵</span>{% endif %}
+            {% endif %}
           </div>
           <div class="chips">
             {% for b in s.breakdown %}
@@ -510,6 +520,7 @@
         {% endfor %}
 
         <!-- Award Picks -->
+        {% if not s.is_goat %}
         <div class="aw-card">
           <div class="aw-title">Award Picks</div>
           <div class="aw-list">
@@ -533,6 +544,7 @@
           <div class="aw-bonus">Award bonus: +{{ s.award_pts }} pts</div>
           {% endif %}
         </div>
+        {% endif %}
       </div>
 
     </div>
