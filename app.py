@@ -85,12 +85,7 @@ KNOCKOUT_QUALIFIED = {
     "Egypt", "Switzerland", "Algeria", "Colombia", "Ghana",
 }
 
-KO_STAGES = {
-    "ROUND_OF_32", "LAST_32",
-    "ROUND_OF_16", "LAST_16",
-    "QUARTER_FINALS", "SEMI_FINALS",
-    "THIRD_PLACE", "FINAL",
-}
+GROUP_STAGE_DONE = True  # all groups have finished
 
 _cache: dict = {"stats": None, "fixtures": None, "matchday": None, "ts": 0.0}
 
@@ -171,7 +166,7 @@ def fetch_raw_from_api() -> tuple[dict, dict, dict]:
         })
 
         stage = match.get("stage", "")
-        is_ko_match = stage in KO_STAGES
+        is_ko_match = bool(stage) and stage != "GROUP_STAGE"
 
         for team, is_home in [(home, True), (away, False)]:
             if team not in raw:
@@ -472,7 +467,7 @@ def index():
         last_updated=last_updated,
         num_players=len(PLAYERS),
         team_code=TEAM_CODE,
-        knockout_qualified=KNOCKOUT_QUALIFIED,
+        group_stage_done=GROUP_STAGE_DONE,
     )
 
 
