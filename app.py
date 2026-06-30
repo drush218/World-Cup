@@ -85,6 +85,13 @@ KNOCKOUT_QUALIFIED = {
     "Egypt", "Switzerland", "Algeria", "Colombia", "Ghana",
 }
 
+KO_STAGES = {
+    "ROUND_OF_32", "LAST_32",
+    "ROUND_OF_16", "LAST_16",
+    "QUARTER_FINALS", "SEMI_FINALS",
+    "THIRD_PLACE", "FINAL",
+}
+
 _cache: dict = {"stats": None, "fixtures": None, "matchday": None, "ts": 0.0}
 
 
@@ -97,13 +104,13 @@ def normalize_team(name: str) -> str:
 
 
 def _empty_raw() -> dict:
-    return {"wins": 0, "losses": 0, "draws": 0, "heavy_losses": 0, "games_played": 0}
+    return {"wins": 0, "losses": 0, "draws": 0, "heavy_losses": 0, "games_played": 0, "ko_eliminated": False}
 
 
 def _finalize(raw: dict, team: str = "") -> dict:
     ko = max(0, raw["games_played"] - 3)
     out = ko > 0 or team in KNOCKOUT_QUALIFIED
-    return {**raw, "ko_rounds": ko, "out_of_group": out, "won_wc": False}
+    return {**raw, "ko_rounds": ko, "out_of_group": out, "ko_eliminated": raw.get("ko_eliminated", False), "won_wc": False}
 
 
 def _pickers_for(team: str) -> list[str]:
@@ -163,6 +170,9 @@ def fetch_raw_from_api() -> tuple[dict, dict, dict]:
             "home_score": int(hs), "away_score": int(as_),
         })
 
+        stage = match.get("stage", "")
+        is_ko_match = stage in KO_STAGES
+
         for team, is_home in [(home, True), (away, False)]:
             if team not in raw:
                 continue
@@ -182,6 +192,8 @@ def fetch_raw_from_api() -> tuple[dict, dict, dict]:
                 if abs(hs - as_) >= 3:
                     raw[team]["heavy_losses"] += 1
                 result = "L"
+                if is_ko_match:
+                    raw[team]["ko_eliminated"] = True
 
             team_matches[team].append({
                 "opponent": opponent,
@@ -290,7 +302,9 @@ def _build_results() -> tuple[dict, dict, dict]:
     for team in all_teams:
         a = api_raw.get(team, _empty_raw())
         f = fix_raw.get(team, _empty_raw())
-        combined = {k: a[k] + f[k] for k in _empty_raw()}
+        numeric_keys = [k for k in _empty_raw() if k != "ko_eliminated"]
+        combined = {k: a[k] + f[k] for k in numeric_keys}
+        combined["ko_eliminated"] = a.get("ko_eliminated", False) or f.get("ko_eliminated", False)
         stats[team] = _finalize(combined, team)
 
     team_fixtures: dict[str, list] = {}
@@ -340,7 +354,7 @@ def save_awards(awards: dict) -> None:
 def _empty_team_stats() -> dict:
     return {
         "wins": 0, "losses": 0, "draws": 0, "heavy_losses": 0,
-        "games_played": 0, "ko_rounds": 0, "out_of_group": False, "won_wc": False,
+        "games_played": 0, "ko_rounds": 0, "out_of_group": False, "ko_eliminated": False, "won_wc": False,
     }
 
 
@@ -458,6 +472,7 @@ def index():
         last_updated=last_updated,
         num_players=len(PLAYERS),
         team_code=TEAM_CODE,
+        knockout_qualified=KNOCKOUT_QUALIFIED,
     )
 
 

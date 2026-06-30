@@ -477,8 +477,9 @@
           <div class="chips">
             {% set ns = namespace(alive=0) %}
             {% for b in s.breakdown %}
-              {% if b.out_of_group %}{% set ns.alive = ns.alive + 1 %}{% endif %}
-              {% set chip_state = 'alive' if b.out_of_group else ('out' if b.games_played >= 3 else 'grp') %}
+              {% set still_in = b.out_of_group and not b.ko_eliminated %}
+              {% if still_in %}{% set ns.alive = ns.alive + 1 %}{% endif %}
+              {% set chip_state = 'alive' if still_in else ('grp' if (not b.out_of_group and not knockout_qualified) else 'out') %}
               <span class="chip chip--{{ chip_state }}">{{ team_code.get(b.team, b.team[:3].upper()) }}</span>
             {% endfor %}
             <span class="alive-badge">{{ ns.alive }}/6 alive</span>
