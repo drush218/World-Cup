@@ -363,7 +363,6 @@ def _team_pts(group: int, s: dict) -> int:
     pts += s["heavy_losses"] * -5
     if s["out_of_group"]:
         pts += 5
-    pts += s["ko_rounds"] * 5
     if s["won_wc"]:
         pts += 8
     return pts
