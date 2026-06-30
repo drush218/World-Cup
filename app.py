@@ -83,6 +83,7 @@ KNOCKOUT_QUALIFIED = {
     "USA", "Bosnia", "Belgium", "Senegal", "Brazil", "Japan", "Ivory Coast",
     "Ecuador", "England", "Congo DR", "Argentina", "Cape Verde", "Australia",
     "Egypt", "Switzerland", "Algeria", "Colombia", "Ghana",
+    "Norway", "Mexico",
 }
 
 GROUP_STAGE_DONE = True  # all groups have finished
