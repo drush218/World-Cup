@@ -214,8 +214,15 @@
       letter-spacing: .03em;
       border-radius: 4px; padding: 1px 4px;
     }
-    .chip--fav { background: #fdeade; color: #c0432f; }
-    .chip--und { background: #e7f3ec; color: #1f7a48; }
+    .chip--alive { background: #d4f0e0; color: #1a6e3a; }
+    .chip--out   { background: #f0e4e4; color: #9a3a3a; opacity: 0.55; }
+    .chip--grp   { background: #eee9de; color: #6b6356; }
+    .alive-badge {
+      font-size: 9px; font-weight: 800;
+      color: #1f9d55; background: #e4f5ec;
+      border-radius: 4px; padding: 1px 6px;
+      letter-spacing: .03em; white-space: nowrap;
+    }
 
     .pts-wrap {
       position: relative;
@@ -468,9 +475,13 @@
             {% endif %}
           </div>
           <div class="chips">
+            {% set ns = namespace(alive=0) %}
             {% for b in s.breakdown %}
-            <span class="chip chip--{{ 'fav' if b.group <= 3 else 'und' }}">{{ team_code.get(b.team, b.team[:3].upper()) }}</span>
+              {% if b.out_of_group %}{% set ns.alive = ns.alive + 1 %}{% endif %}
+              {% set chip_state = 'alive' if b.out_of_group else ('out' if b.games_played >= 3 else 'grp') %}
+              <span class="chip chip--{{ chip_state }}">{{ team_code.get(b.team, b.team[:3].upper()) }}</span>
             {% endfor %}
+            <span class="alive-badge">{{ ns.alive }}/6 alive</span>
           </div>
         </div>
         <div class="pts-wrap">

@@ -77,6 +77,14 @@ TEAM_NAME_MAP = {
     "Iran (Islamic Republic of)": "Iran",
 }
 
+KNOCKOUT_QUALIFIED = {
+    "Germany", "Paraguay", "France", "Sweden", "South Africa", "Canada",
+    "Netherlands", "Morocco", "Portugal", "Croatia", "Spain", "Austria",
+    "USA", "Bosnia", "Belgium", "Senegal", "Brazil", "Japan", "Ivory Coast",
+    "Ecuador", "England", "Congo DR", "Argentina", "Cape Verde", "Australia",
+    "Egypt", "Switzerland", "Algeria", "Colombia", "Ghana",
+}
+
 _cache: dict = {"stats": None, "fixtures": None, "matchday": None, "ts": 0.0}
 
 
@@ -92,9 +100,10 @@ def _empty_raw() -> dict:
     return {"wins": 0, "losses": 0, "draws": 0, "heavy_losses": 0, "games_played": 0}
 
 
-def _finalize(raw: dict) -> dict:
+def _finalize(raw: dict, team: str = "") -> dict:
     ko = max(0, raw["games_played"] - 3)
-    return {**raw, "ko_rounds": ko, "out_of_group": ko > 0, "won_wc": False}
+    out = ko > 0 or team in KNOCKOUT_QUALIFIED
+    return {**raw, "ko_rounds": ko, "out_of_group": out, "won_wc": False}
 
 
 def _pickers_for(team: str) -> list[str]:
@@ -282,7 +291,7 @@ def _build_results() -> tuple[dict, dict, dict]:
         a = api_raw.get(team, _empty_raw())
         f = fix_raw.get(team, _empty_raw())
         combined = {k: a[k] + f[k] for k in _empty_raw()}
-        stats[team] = _finalize(combined)
+        stats[team] = _finalize(combined, team)
 
     team_fixtures: dict[str, list] = {}
     for team in set(api_matches) | set(fix_matches):
