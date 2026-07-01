@@ -18,7 +18,7 @@ from datetime import datetime
 import streamlit.components.v1 as components
 from jinja2 import Environment, FileSystemLoader
 
-from app import PLAYERS, TEAM_CODE, _cache, compute_scores, load_awards
+from app import PLAYERS, TEAM_CODE, GROUP_STAGE_DONE, _cache, compute_scores, load_awards
 
 st.set_page_config(
     page_title="The Table – WC2026 Sweepstake",
@@ -55,6 +55,7 @@ html = env.get_template("index.html").render(
     last_updated=last_updated,
     num_players=len(PLAYERS),
     team_code=TEAM_CODE,
+    group_stage_done=GROUP_STAGE_DONE,
 )
 
 components.html(html, height=2600, scrolling=True)
